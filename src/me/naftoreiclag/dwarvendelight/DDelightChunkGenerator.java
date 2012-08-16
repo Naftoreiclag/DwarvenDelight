@@ -26,22 +26,25 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	    byte[] chunkResult = new byte[32768];
 
 	    //stone
-	    /*for(int x=0; x<16; x++)
+	    for(int x=0; x<16; x++)
 	    {
-	    	for(int y=1; y<122; y++)
+	    	for(int y=1; y<120; y++)
 		    {
 			    for(int z=0; z<16; z++)
 			    {
-			    	chunkResult[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
+			    	chunkResult[pointToByte(x,y,z)] = (byte) Material.SPONGE.getId();
 			    }
 		    }
-	    }*/
+	    }
 	    
-	    //
-	    chunkResult = testHills(chunkResult, chunkX, chunkZ);
-	   
-	    //No dwarfs in the void please.
-	    chunkResult = bedrockBottom(chunkResult);
+	    //add hills
+	    chunkResult = addSurfaceHills(chunkResult, chunkX, chunkZ,120);
+	    
+	    //No dwarfs in the void please. (add bedrock)
+	    chunkResult = addBedrockBottom(chunkResult);
+	    
+	    //add surface decor
+	    chunkResult = addSurfaceDecor(chunkResult, 115);
 	    
 	    //return new chunk
 	    return chunkResult;
@@ -75,7 +78,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
     }
     
     //add bedrock to the bottom
-    private byte[] bedrockBottom(byte[] returnValue)
+    private byte[] addBedrockBottom(byte[] returnValue)
     {
     	int y = 0;
 	    for(int x=0; x<16; x++)
@@ -89,24 +92,83 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		return returnValue;
     }
     
-    //test; code from codename_B (Won't be in final release)
-    private byte[] testHills(byte[] returnValue, int chunkX, int chunkZ)
+    //add bedrock to the bottom
+    private byte[] addSurfaceDecor(byte[] returnValue, int altitude)
     {
-    	for (int x=0; x<16; x++)
+    	//dirt-ify
+	    for(int x=0; x<16; x++)
+	    {
+		    for(int z=0; z<16; z++)
+		    {
+		    	for(int y = altitude - 1; y < 127; y ++)
+                {
+		    		if(returnValue[pointToByte(x,y,z)] == (byte) Material.STONE.getId())
+		    		{
+		    			returnValue[pointToByte(x,y,z)] = (byte) Material.DIRT.getId();
+		    		}
+                }
+		    }
+	    }
+    	
+	    //grass-ify
+	    boolean potato;
+	    for(int x=0; x<16; x++)
+	    {
+		    for(int z=0; z<16; z++)
+		    {
+		    	potato = false;
+		    	for(int y = 127; y > altitude - 2; y --)
+                {
+		    		if(returnValue[pointToByte(x,y,z)] == (byte) Material.DIRT.getId() && !potato)
+		    		{
+		    			returnValue[pointToByte(x,y,z)] = (byte) Material.GRASS.getId();
+		    			potato = true;
+		    		}
+                }
+		    }
+	    }
+	    
+	    //tallgrass-ify
+	    boolean bacon;
+	    for(int x=0; x<16; x++)
+	    {
+		    for(int z=0; z<16; z++)
+		    {
+		    	bacon = false;
+		    	for(int y = 127; y > altitude - 2; y --)
+                {
+		    		if(returnValue[pointToByte(x,y,z)] == (byte) Material.GRASS.getId() && !bacon)
+		    		{
+		    			returnValue[pointToByte(x,y + 1,z)] = (byte) Material.SAPLING.getId();
+		    			bacon = true;
+		    		}
+                }
+		    }
+	    }
+	    
+		return returnValue;
+    }
+    
+    //code is a modified version of codename_B's example code
+    private byte[] addSurfaceHills(byte[] returnValue, int chunkX, int chunkZ, int altitude)
+    {
+    	//get the changes
+    	for (int x = 0; x < 16; x ++)
     	{
-            for (int z=0; z<16; z++)
+            for (int z = 0; z < 16; z ++)
             {
                 // This generates noise based on the absolute x and z (between -1 and 1) - it will be smooth noise if all goes well - multiply it by the desired value - 16 is good for hilly terrain.
-                double noise = gen.noise(x+chunkX*16, z+chunkZ*16, 0.5, 0.5)*16;
+                double noise = gen.noise(x + (chunkX * 16), z + (chunkZ * 16), 0.5, 0.5) * 3;
                 
-                for(int y=0; y<32+noise; y++)
+                for(int y = altitude - 1; y < altitude + noise; y ++)
                 {
-                    // Obviously sets that byte[] corresponding to the chunk x,y,z to stone - you can use your preferred way of doing this.
-                	returnValue[pointToByte(x,y,z)] = (byte)  (Material.STONE).getId();
+                	//sets that block
+                	returnValue[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
                 }
             }
         }
     	
+    	//return the changes
 		return returnValue;
     }
 }
