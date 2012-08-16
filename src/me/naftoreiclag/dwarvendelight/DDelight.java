@@ -1,32 +1,50 @@
 package me.naftoreiclag.dwarvendelight;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DDelight extends JavaPlugin
 {
 	//define logger
-	Logger ConsoleLog;
+	private Logger consoleLog;
+	private DDelightChunkGenerator chunkGenerator;
 	
     public void onEnable()
     {
     	//get the logger
-    	ConsoleLog = this.getLogger();
+    	consoleLog = this.getLogger();
     	
     	//log something
-    	ConsoleLog.info("Dwarven Delight 0.1 enabled.");
+    	consoleLog.info("Dwarven Delight 0.1 enabled.");
     }
+    
+	private ArrayList<BlockPopulator> loadPopulators()
+	{
+		ArrayList<BlockPopulator> populators = new ArrayList<BlockPopulator>();
+		populators.add(new PopulatorTallgrass());
+		
+		return populators;
+	}
     
     public void onDisable()
     {
     	//log something
-    	ConsoleLog.info("Dwarven Delight 0.1 disabled.");
+    	consoleLog.info("Dwarven Delight 0.1 disabled.");
     }
 	
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        return new DDelightChunkGenerator();
+		//if there isn't already a generator, make one.
+		if(chunkGenerator == null)
+		{
+			chunkGenerator = new DDelightChunkGenerator(loadPopulators());
+		}
+		
+		//return it
+        return chunkGenerator;
     }
 }

@@ -1,18 +1,30 @@
 package me.naftoreiclag.dwarvendelight;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 public class DDelightChunkGenerator extends ChunkGenerator
 {
-	Random seed;
+	private Random seed;
 	
-	SimplexOctaveGenerator gen;
+	private SimplexOctaveGenerator gen;
+
+	private ArrayList<BlockPopulator> populators;
+	
+	//constructor
+	public DDelightChunkGenerator(ArrayList<BlockPopulator> a_populators)
+	{
+		this.populators = a_populators;
+	}
+	
 	
     //Overrides the default chunk generation code.
     @Override
@@ -32,7 +44,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=0; z<16; z++)
 			    {
-			    	chunkResult[pointToByte(x,y,z)] = (byte) Material.SPONGE.getId();
+			    	chunkResult[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
 			    }
 		    }
 	    }
@@ -43,12 +55,19 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	    //No dwarfs in the void please. (add bedrock)
 	    chunkResult = addBedrockBottom(chunkResult);
 	    
-	    //add surface decor
+	    //add surface grass
 	    chunkResult = addSurfaceDecor(chunkResult, 115);
 	    
 	    //return new chunk
 	    return chunkResult;
     }
+    
+    //Overrides populators
+	@Override
+	public List<BlockPopulator> getDefaultPopulators(World world)
+	{
+		return populators;
+	}
     
     //Overrides the default spawning check.
     @Override
@@ -123,24 +142,6 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    		{
 		    			returnValue[pointToByte(x,y,z)] = (byte) Material.GRASS.getId();
 		    			potato = true;
-		    		}
-                }
-		    }
-	    }
-	    
-	    //tallgrass-ify
-	    boolean bacon;
-	    for(int x=0; x<16; x++)
-	    {
-		    for(int z=0; z<16; z++)
-		    {
-		    	bacon = false;
-		    	for(int y = 127; y > altitude - 2; y --)
-                {
-		    		if(returnValue[pointToByte(x,y,z)] == (byte) Material.GRASS.getId() && !bacon)
-		    		{
-		    			returnValue[pointToByte(x,y + 1,z)] = (byte) Material.SAPLING.getId();
-		    			bacon = true;
 		    		}
                 }
 		    }
