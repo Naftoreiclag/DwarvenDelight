@@ -11,7 +11,7 @@ MatorKaleen - Tutorial on creating basic custom world generators: Very helpful
 
 codename_B - Multiple tutorials on creating custom world generators: Also very helpful.
 
-s1mpl3x - Gracefully providing source code for Nordic: Used as frequent reference.
+s1mpl3x - Gracefully providing source code for Nordic: Used as frequent reference. & Making the literally awesome octave generator.
 
 License
 ======
