@@ -7,8 +7,10 @@ Dwarven Delight is a bukkit plugin that creates an entirely underground world to
 Special Thanks
 ======
 
-MatorKaleen - Tutorial on creating basic custom world generators: Very helpful.
+MatorKaleen - Tutorial on creating basic custom world generators: Very helpful
+
 codename_B - Multiple tutorials on creating custom world generators: Also very helpful.
+
 s1mpl3x - Gracefully providing source code for Nordic: Used as frequent reference.
 
 License
