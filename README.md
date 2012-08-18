@@ -1,6 +1,6 @@
 Dwarven Delight
 ======
-Current Version: 0.1
+Current Version: 0.2.0
 
 Dwarven Delight is a bukkit plugin that creates an entirely underground world to explore and conquer.
 
