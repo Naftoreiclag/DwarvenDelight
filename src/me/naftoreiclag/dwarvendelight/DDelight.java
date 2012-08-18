@@ -26,6 +26,12 @@ public class DDelight extends JavaPlugin
 	{
 		ArrayList<BlockPopulator> populators = new ArrayList<BlockPopulator>();
 		populators.add(new PopulatorTallgrass());
+		populators.add(new PopulatorShrub());
+		populators.add(new PopulatorSurfaceRocks());
+		populators.add(new PopulatorOreCoal());
+		populators.add(new PopulatorOreIron());
+		populators.add(new PopulatorOreGold());
+		populators.add(new PopulatorOreRocks());
 		
 		return populators;
 	}
