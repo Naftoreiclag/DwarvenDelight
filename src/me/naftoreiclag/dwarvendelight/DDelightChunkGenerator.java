@@ -7,6 +7,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
@@ -25,10 +26,9 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		this.populators = a_populators;
 	}
 	
-	
     //the default chunk generation code.
     @Override
-    public byte[][] generateBlockSections(World world, Random rand, int chunkX, int chunkZ, BiomeGrid biomes) 
+    public byte[][] generateBlockSections(World world, Random rand, int chunkX, int chunkZ, BiomeGrid biomeGrid) 
     {
     	//seeds are cool
 		seed = new Random(world.getSeed());
@@ -38,35 +38,31 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		
 		//Simplex's amazing octave generator (Magic bullet!)
 		gen =  new SimplexOctaveGenerator(seed, 8);
-		gen.setScale(1/64.0);
+		gen.setScale(1 / 64.0);
 		
 	    //base stone
-	    for(int x=0; x<16; x++)
-	    {
-	    	for(int y=1; y<120; y++)
-		    {
-			    for(int z=0; z<16; z++)
-			    {
-			    	//new
-			    	setBlockAt(chunkResult, x, y, z, (byte) Material.STONE.getId());
-			    	
-			    	////old:
-			    	//chunkResult[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
-			    }
-		    }
-	    }
+	    addBaseStone(chunkResult);
 	    
 	    //add hills
-	    addSurfaceHills(chunkResult, chunkX, chunkZ,120);
+	    addSurfaceHills(chunkResult, chunkX, chunkZ, 250);
 	    
 	    //No dwarfs in the void please. (add bedrock)
 	    addBedrockBottom(chunkResult);
 	    
 	    //add surface grass
-	    addSurfaceDecor(chunkResult, 115);
+	    addSurfaceDecor(chunkResult, 245);
 	    
 	    //add stater house
-	    addStarterHouse(chunkResult, chunkX, chunkZ, 120);
+	    addStarterHouse(chunkResult, chunkX, chunkZ, 250);
+	    
+	    //remove animals
+    	for (int x = 0; x < 16; x++)
+    	{
+			for (int z = 0; z < 16; z++)
+			{
+				biomeGrid.setBiome(x, z, Biome.DESERT);
+			}
+    	}
 	    
 	    //return new chunk
 	    return chunkResult;
@@ -85,23 +81,6 @@ public class DDelightChunkGenerator extends ChunkGenerator
         }
         return result[y >> 4][((y & 0xF) << 8) | (z << 4) | x];
     }
-    
-    //does not work *sadface*
-    /*public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomeGrid)
-    {
-    	byte[][] returnValue = new byte[16][];
-    	
-    	//tonight dwarves, we dine in hell!
-    	for (int x = 0; x < 16; x++)
-    	{
-			for (int z = 0; z < 16; z++)
-			{
-				biomeGrid.setBiome(x, z, Biome.HELL);
-			}
-    	}
-    	
-    	return returnValue;
-    }*/
     
     //Overrides populators
 	@Override
@@ -131,11 +110,22 @@ public class DDelightChunkGenerator extends ChunkGenerator
         return new Location(world, 6.5, world.getHighestBlockYAt(6, 6) - 4, 6.5);
     }
     
-    //This converts relative chunk locations to bytes that can be written to the chunk
-    /*private int pointToByte(int x, int y, int z)
+    //add base stone
+    private void addBaseStone(byte[][] result)
     {
-    	return (x * 16 + z) * 128 + y;
-    }*/
+    	//stone stuff
+    	for(int x=0; x<16; x++)
+	    {
+	    	for(int y=1; y<250; y++)
+		    {
+			    for(int z=0; z<16; z++)
+			    {
+			    	//new
+			    	setBlockAt(result, x, y, z, (byte) Material.STONE.getId());
+			    }
+		    }
+	    }
+    }
     
 	//add starter house
     private void addStarterHouse(byte[][] result, int chunkX, int chunkZ, int altitude)
@@ -146,7 +136,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	    	int y = altitude;
 	    	
 	    	//find point to start building at
-	    	for(int i = altitude; i <= 123; i ++)
+	    	for(int i = altitude; i <= 250; i ++)
 	    	{
 	    		if(getBlockAt(result, 3, i, 3) == (byte) Material.AIR.getId())
 	    		{
@@ -266,7 +256,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	    {
 		    for(int z=0; z<16; z++)
 		    {
-		    	for(int y = altitude - 1; y < 127; y ++)
+		    	for(int y = altitude - 1; y < 256; y ++)
                 {
 		    		if(getBlockAt(result, x, y, z) == (byte) Material.STONE.getId())
 		    		{
@@ -283,7 +273,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    for(int z=0; z<16; z++)
 		    {
 		    	potato = false;
-		    	for(int y = 127; y > altitude - 2; y --)
+		    	for(int y = 255; y > altitude - 2; y --)
                 {
 		    		if(getBlockAt(result, x, y, z) == (byte) Material.DIRT.getId() && !potato)
 		    		{

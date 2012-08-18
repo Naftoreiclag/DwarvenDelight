@@ -18,13 +18,13 @@ public class PopulatorOreIron extends BlockPopulator
 			for (int z = 0; z < 16; z++)
 			{
 				//get a random number between 0 and 1000
-				int chance = random.nextInt(150);
-				int depth = random.nextInt(120);
+				int chance = random.nextInt(2);
+				int depth = random.nextInt(250);
 				
 				//target a block
 				Block targetBlock;
 				
-				if(chance <= 1)
+				if(chance == 0)
 				{
 					for(int a = 0; a < 2; a ++)
 					{

@@ -19,7 +19,7 @@ public class DDelight extends JavaPlugin
     	consoleLog = this.getLogger();
     	
     	//log something
-    	consoleLog.info("Dwarven Delight 0.1 enabled.");
+    	consoleLog.info("Dwarven Delight enabled.");
     }
     
 	private ArrayList<BlockPopulator> loadPopulators()
@@ -28,10 +28,11 @@ public class DDelight extends JavaPlugin
 		populators.add(new PopulatorTallgrass());
 		populators.add(new PopulatorSurfaceShrub());
 		populators.add(new PopulatorSurfaceRocks());
+		populators.add(new PopulatorSilverfishNest());
+		populators.add(new PopulatorAirPockets());
 		populators.add(new PopulatorOreCoal());
 		populators.add(new PopulatorOreIron());
 		populators.add(new PopulatorOreGold());
-		populators.add(new PopulatorSilverfishNest());
 		populators.add(new PopulatorBedrockNoise());
 		populators.add(new PopulatorBedrockLava());
 		
@@ -41,7 +42,7 @@ public class DDelight extends JavaPlugin
     public void onDisable()
     {
     	//log something
-    	consoleLog.info("Dwarven Delight 0.1 disabled.");
+    	consoleLog.info("Dwarven Delight disabled.");
     }
 	
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)

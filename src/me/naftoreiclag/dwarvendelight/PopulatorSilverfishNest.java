@@ -18,8 +18,8 @@ public class PopulatorSilverfishNest extends BlockPopulator
 			for (int z = 0; z < 16; z++)
 			{
 				//get a random number between 0 and 1000
-				int chance = random.nextInt(2000);
-				int depth = random.nextInt(120);
+				int chance = random.nextInt(200);
+				int depth = random.nextInt(250);
 				
 				//target a block
 				Block targetBlock;
