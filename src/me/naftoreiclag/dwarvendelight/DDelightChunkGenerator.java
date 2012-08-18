@@ -26,7 +26,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	}
 	
 	
-    //Overrides the default chunk generation code.
+    //the default chunk generation code.
     @Override
     public byte[] generate(World world, Random rand, int chunkX, int chunkZ)
     {
@@ -37,7 +37,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
     	//define new chunk
 	    byte[] chunkResult = new byte[32768];
 
-	    //stone
+	    //base stone
 	    for(int x=0; x<16; x++)
 	    {
 	    	for(int y=1; y<120; y++)
@@ -58,9 +58,30 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	    //add surface grass
 	    chunkResult = addSurfaceDecor(chunkResult, 115);
 	    
+	    //add stater house
+	    chunkResult = addStarterHouse(chunkResult, chunkX, chunkZ, 120);
+	    
 	    //return new chunk
 	    return chunkResult;
     }
+    
+    
+    //does not work *sadface*
+    /*public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomeGrid)
+    {
+    	byte[][] returnValue = new byte[16][];
+    	
+    	//tonight dwarves, we dine in hell!
+    	for (int x = 0; x < 16; x++)
+    	{
+			for (int z = 0; z < 16; z++)
+			{
+				biomeGrid.setBiome(x, z, Biome.HELL);
+			}
+    	}
+    	
+    	return returnValue;
+    }*/
     
     //Overrides populators
 	@Override
@@ -87,13 +108,116 @@ public class DDelightChunkGenerator extends ChunkGenerator
         }
         
         //set spawn
-        return new Location(world, 0, world.getHighestBlockYAt(0, 0), 0);
+        return new Location(world, 6.5, world.getHighestBlockYAt(6, 6) - 4, 6.5);
     }
     
     //This converts relative chunk locations to bytes that can be written to the chunk
     private int pointToByte(int x, int y, int z)
     {
     	return (x * 16 + z) * 128 + y;
+    }
+    
+	//add starter house
+    private byte[] addStarterHouse(byte[] returnValue, int chunkX, int chunkZ, int altitude)
+    {
+    	if(chunkX == 0 && chunkZ == 0)
+    	{
+	    	int y = altitude;
+	    	
+	    	for(int i = altitude; i <= 123; i ++)
+	    	{
+	    		if(returnValue[pointToByte(3,i,3)] == (byte) Material.AIR.getId())
+	    		{
+	    			y = i - 1;
+	    			break;
+	    		}
+	    	}
+	    	
+	    	byte houseMat = (byte) Material.WOOD.getId();
+	    	
+	    	//wooden floor
+		    for(int x=3; x<10; x++)
+		    {
+			    for(int z=3; z<10; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    }
+		    }
+		    
+		    //wall 1
+		    y ++;
+		    for(int x=3; x<10; x++)
+		    {
+			    for(int z=3; z<10; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    }
+		    }
+		    for(int x=4; x<9; x++)
+		    {
+			    for(int z=4; z<9; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = (byte) Material.AIR.getId();
+			    }
+		    }
+		    //door 1
+		    returnValue[pointToByte(3,y,6)] = (byte) Material.AIR.getId();
+		    
+		    //wall 2
+		    y ++;
+		    for(int x=3; x<10; x++)
+		    {
+			    for(int z=3; z<10; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    }
+		    }
+		    for(int x=4; x<9; x++)
+		    {
+			    for(int z=4; z<9; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = (byte) Material.AIR.getId();
+			    }
+		    }
+		    //door 2
+		    returnValue[pointToByte(3,y,6)] = (byte) Material.AIR.getId();
+		    //windows
+		    returnValue[pointToByte(5,y,3)] = (byte) Material.AIR.getId();
+		    returnValue[pointToByte(7,y,3)] = (byte) Material.AIR.getId();
+		    returnValue[pointToByte(9,y,5)] = (byte) Material.AIR.getId();
+		    returnValue[pointToByte(9,y,7)] = (byte) Material.AIR.getId();
+		    returnValue[pointToByte(7,y,9)] = (byte) Material.AIR.getId();
+		    returnValue[pointToByte(5,y,9)] = (byte) Material.AIR.getId();
+		    
+		    //wall 3
+		    y ++;
+		    for(int x=3; x<10; x++)
+		    {
+			    for(int z=3; z<10; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    }
+		    }
+		    for(int x=4; x<9; x++)
+		    {
+			    for(int z=4; z<9; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = (byte) Material.AIR.getId();
+			    }
+		    }
+		    
+		    //ceiling
+		    y ++;
+		    for(int x=3; x<10; x++)
+		    {
+			    for(int z=3; z<10; z++)
+			    {
+			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    }
+		    }
+    	}
+    	
+		return returnValue;
     }
     
     //add bedrock to the bottom
