@@ -28,15 +28,18 @@ public class DDelightChunkGenerator extends ChunkGenerator
 	
     //the default chunk generation code.
     @Override
-    public byte[] generate(World world, Random rand, int chunkX, int chunkZ)
+    public byte[][] generateBlockSections(World world, Random rand, int chunkX, int chunkZ, BiomeGrid biomes) 
     {
+    	//seeds are cool
 		seed = new Random(world.getSeed());
+		
+		//define new chunk
+		byte[][] chunkResult = new byte[16][];
+		
+		//Simplex's amazing octave generator (Magic bullet!)
 		gen =  new SimplexOctaveGenerator(seed, 8);
 		gen.setScale(1/64.0);
 		
-    	//define new chunk
-	    byte[] chunkResult = new byte[32768];
-
 	    //base stone
 	    for(int x=0; x<16; x++)
 	    {
@@ -44,27 +47,44 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=0; z<16; z++)
 			    {
-			    	chunkResult[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
+			    	//new
+			    	setBlockAt(chunkResult, x, y, z, (byte) Material.STONE.getId());
+			    	
+			    	////old:
+			    	//chunkResult[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
 			    }
 		    }
 	    }
 	    
 	    //add hills
-	    chunkResult = addSurfaceHills(chunkResult, chunkX, chunkZ,120);
+	    addSurfaceHills(chunkResult, chunkX, chunkZ,120);
 	    
 	    //No dwarfs in the void please. (add bedrock)
-	    chunkResult = addBedrockBottom(chunkResult);
+	    addBedrockBottom(chunkResult);
 	    
 	    //add surface grass
-	    chunkResult = addSurfaceDecor(chunkResult, 115);
+	    addSurfaceDecor(chunkResult, 115);
 	    
 	    //add stater house
-	    chunkResult = addStarterHouse(chunkResult, chunkX, chunkZ, 120);
+	    addStarterHouse(chunkResult, chunkX, chunkZ, 120);
 	    
 	    //return new chunk
 	    return chunkResult;
     }
     
+    //copied from javadocs
+    private void setBlockAt(byte[][] result, int x, int y, int z, byte blkid) {
+        if (result[y >> 4] == null) {
+            result[y >> 4] = new byte[4096];
+        }
+        result[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = blkid;
+    }
+    private byte getBlockAt(byte[][] result, int x, int y, int z) {
+        if (result[y >> 4] == null) {
+            return (byte)0;
+        }
+        return result[y >> 4][((y & 0xF) << 8) | (z << 4) | x];
+    }
     
     //does not work *sadface*
     /*public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomeGrid)
@@ -112,27 +132,30 @@ public class DDelightChunkGenerator extends ChunkGenerator
     }
     
     //This converts relative chunk locations to bytes that can be written to the chunk
-    private int pointToByte(int x, int y, int z)
+    /*private int pointToByte(int x, int y, int z)
     {
     	return (x * 16 + z) * 128 + y;
-    }
+    }*/
     
 	//add starter house
-    private byte[] addStarterHouse(byte[] returnValue, int chunkX, int chunkZ, int altitude)
+    private void addStarterHouse(byte[][] result, int chunkX, int chunkZ, int altitude)
     {
     	if(chunkX == 0 && chunkZ == 0)
     	{
+    		//define y
 	    	int y = altitude;
 	    	
+	    	//find point to start building at
 	    	for(int i = altitude; i <= 123; i ++)
 	    	{
-	    		if(returnValue[pointToByte(3,i,3)] == (byte) Material.AIR.getId())
+	    		if(getBlockAt(result, 3, i, 3) == (byte) Material.AIR.getId())
 	    		{
 	    			y = i - 1;
 	    			break;
 	    		}
 	    	}
 	    	
+	    	//material of the house
 	    	byte houseMat = (byte) Material.WOOD.getId();
 	    	
 	    	//wooden floor
@@ -140,7 +163,7 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=3; z<10; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    	setBlockAt(result, x, y, z, houseMat);
 			    }
 		    }
 		    
@@ -150,18 +173,18 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=3; z<10; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    	setBlockAt(result, x, y, z, houseMat);
 			    }
 		    }
 		    for(int x=4; x<9; x++)
 		    {
 			    for(int z=4; z<9; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = (byte) Material.AIR.getId();
+			    	setBlockAt(result, x, y, z, (byte) Material.AIR.getId());
 			    }
 		    }
 		    //door 1
-		    returnValue[pointToByte(3,y,6)] = (byte) Material.AIR.getId();
+		    setBlockAt(result, 3, y, 6, (byte) Material.AIR.getId());
 		    
 		    //wall 2
 		    y ++;
@@ -169,25 +192,26 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=3; z<10; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    	setBlockAt(result, x, y, z, houseMat);
 			    }
 		    }
 		    for(int x=4; x<9; x++)
 		    {
 			    for(int z=4; z<9; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = (byte) Material.AIR.getId();
+			    	setBlockAt(result, x, y, z, (byte) Material.AIR.getId());
 			    }
 		    }
 		    //door 2
-		    returnValue[pointToByte(3,y,6)] = (byte) Material.AIR.getId();
+		    setBlockAt(result, 3,y,6, (byte) Material.AIR.getId());
+		    
 		    //windows
-		    returnValue[pointToByte(5,y,3)] = (byte) Material.AIR.getId();
-		    returnValue[pointToByte(7,y,3)] = (byte) Material.AIR.getId();
-		    returnValue[pointToByte(9,y,5)] = (byte) Material.AIR.getId();
-		    returnValue[pointToByte(9,y,7)] = (byte) Material.AIR.getId();
-		    returnValue[pointToByte(7,y,9)] = (byte) Material.AIR.getId();
-		    returnValue[pointToByte(5,y,9)] = (byte) Material.AIR.getId();
+		    setBlockAt(result, 5,y,3, (byte) Material.AIR.getId());
+		    setBlockAt(result, 7,y,3, (byte) Material.AIR.getId());
+		    setBlockAt(result, 9,y,5, (byte) Material.AIR.getId());
+		    setBlockAt(result, 9,y,7, (byte) Material.AIR.getId());
+		    setBlockAt(result, 7,y,9, (byte) Material.AIR.getId());
+		    setBlockAt(result, 5,y,9, (byte) Material.AIR.getId());
 		    
 		    //wall 3
 		    y ++;
@@ -195,14 +219,14 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=3; z<10; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    	setBlockAt(result, x, y, z, houseMat);
 			    }
 		    }
 		    for(int x=4; x<9; x++)
 		    {
 			    for(int z=4; z<9; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = (byte) Material.AIR.getId();
+			    	setBlockAt(result, x, y, z, (byte) Material.AIR.getId());
 			    }
 		    }
 		    
@@ -212,31 +236,30 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 			    for(int z=3; z<10; z++)
 			    {
-			    	returnValue[pointToByte(x,y,z)] = houseMat;
+			    	setBlockAt(result, x, y, z, houseMat);
 			    }
 		    }
     	}
-    	
-		return returnValue;
     }
     
     //add bedrock to the bottom
-    private byte[] addBedrockBottom(byte[] returnValue)
+    private void addBedrockBottom(byte[][] result)
     {
+    	//always at 0
     	int y = 0;
+    	
+    	//256 blocks
 	    for(int x=0; x<16; x++)
 	    {
 		    for(int z=0; z<16; z++)
 		    {
-		    	returnValue[pointToByte(x,y,z)] = (byte) Material.BEDROCK.getId();
+		    	setBlockAt(result, x, y, z, (byte) Material.BEDROCK.getId());
 		    }
 	    }
-    	
-		return returnValue;
     }
     
-    //add bedrock to the bottom
-    private byte[] addSurfaceDecor(byte[] returnValue, int altitude)
+    //add surface decorations
+    private void addSurfaceDecor(byte[][] result, int altitude)
     {
     	//dirt-ify
 	    for(int x=0; x<16; x++)
@@ -245,9 +268,9 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    {
 		    	for(int y = altitude - 1; y < 127; y ++)
                 {
-		    		if(returnValue[pointToByte(x,y,z)] == (byte) Material.STONE.getId())
+		    		if(getBlockAt(result, x, y, z) == (byte) Material.STONE.getId())
 		    		{
-		    			returnValue[pointToByte(x,y,z)] = (byte) Material.DIRT.getId();
+		    			setBlockAt(result, x, y, z, (byte) Material.DIRT.getId());
 		    		}
                 }
 		    }
@@ -262,20 +285,18 @@ public class DDelightChunkGenerator extends ChunkGenerator
 		    	potato = false;
 		    	for(int y = 127; y > altitude - 2; y --)
                 {
-		    		if(returnValue[pointToByte(x,y,z)] == (byte) Material.DIRT.getId() && !potato)
+		    		if(getBlockAt(result, x, y, z) == (byte) Material.DIRT.getId() && !potato)
 		    		{
-		    			returnValue[pointToByte(x,y,z)] = (byte) Material.GRASS.getId();
+		    			setBlockAt(result, x, y, z, (byte) Material.GRASS.getId());
 		    			potato = true;
 		    		}
                 }
 		    }
 	    }
-	    
-		return returnValue;
     }
     
     //code is a modified version of codename_B's example code
-    private byte[] addSurfaceHills(byte[] returnValue, int chunkX, int chunkZ, int altitude)
+    private void addSurfaceHills(byte[][] result, int chunkX, int chunkZ, int altitude)
     {
     	//get the changes
     	for (int x = 0; x < 16; x ++)
@@ -288,12 +309,9 @@ public class DDelightChunkGenerator extends ChunkGenerator
                 for(int y = altitude - 1; y < altitude + noise; y ++)
                 {
                 	//sets that block
-                	returnValue[pointToByte(x,y,z)] = (byte) Material.STONE.getId();
+                	setBlockAt(result, x, y, z, (byte) Material.STONE.getId());
                 }
             }
         }
-    	
-    	//return the changes
-		return returnValue;
     }
 }

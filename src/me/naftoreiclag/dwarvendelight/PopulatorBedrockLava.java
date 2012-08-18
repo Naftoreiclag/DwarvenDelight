@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.generator.BlockPopulator;
 
-public class PopulatorBedrockNoise extends BlockPopulator
+public class PopulatorBedrockLava extends BlockPopulator
 {
 	@Override
 	public void populate(World world, Random random, Chunk baseChunk)
@@ -23,9 +23,9 @@ public class PopulatorBedrockNoise extends BlockPopulator
 					
 					if(targetBlock.getTypeId() == Material.STONE.getId())
 					{
-						if(random.nextInt(16) >= y)
+						if(random.nextInt(32) >= y)
 						{
-							targetBlock.setTypeIdAndData(Material.BEDROCK.getId(), (byte) 0, true);
+							targetBlock.setTypeIdAndData(Material.STATIONARY_LAVA.getId(), (byte) 0, true);
 						}
 					}
 				}
