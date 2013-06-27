@@ -30,7 +30,7 @@ public class PopulatorShrub extends BlockPopulator
 					if (chance < 1)
 					{
 						//set to log
-						targetBlock.setTypeIdAndData(Material.FENCE.getId(), (byte) 2, true);
+						targetBlock.setTypeIdAndData(Material.WOOD.getId(), (byte) 2, true);
 						
 						//set to leaves
 						targetBlock.getRelative(BlockFace.UP, 1).setTypeIdAndData(Material.LEAVES.getId(), (byte) 3, true);
